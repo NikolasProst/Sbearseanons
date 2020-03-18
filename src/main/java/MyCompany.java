@@ -6,7 +6,7 @@ import java.util.Properties;
 
 public class MyCompany {
 
-    public static final MyCompany company = new  MyCompany();
+    private static volatile MyCompany instance = new MyCompany();
 
     @Property(propertyName = "com.mycompany.name")
     private String myCompanyName;
@@ -20,17 +20,16 @@ public class MyCompany {
     private MyCompany() {
         FileInputStream fis;
         Properties property = new Properties();
-        Class<? extends MyCompany> cls = company.getClass();
-        Annotation[] a = cls.getAnnotations();
-        for(int i = 0; i < a.length; i++) {
-            System.out.println(a[i]);
+        Annotation[] a = this.getClass().getAnnotations();
+        for (int i = 0; i < a.length; i++) {
+            System.out.println(a[i].toString());
         }
         try {
             /** чтение файла properties */
             fis = new FileInputStream("my.properties");
             property.load(fis);
 
-            System.out.println(property.toString());
+            //System.out.println(property.toString());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -38,11 +37,24 @@ public class MyCompany {
         }
     }
 
+    public static MyCompany getInstance() {
+        MyCompany localInstance = instance;
+        if (localInstance == null) {
+            synchronized (MyCompany.class) {
+                localInstance = instance;
+                if (localInstance == null) {
+                    instance = localInstance = new MyCompany();
+                }
+            }
+        }
+        return localInstance;
+    }
+
     public static synchronized void doRefresh(){
 
     }
 
     public static void main(String[] args) {
-
+        MyCompany company = MyCompany.getInstance();
     }
 }
