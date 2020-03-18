@@ -1,7 +1,7 @@
 import java.lang.annotation.*;
 
-@Target(value=ElementType.FIELD)
-@Retention(value= RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Property {
 
     String propertyName() default "null";

@@ -19,6 +19,13 @@
             </plugin>
         </plugins>
     </build>
+    <dependencies>
+        <dependency>
+            <groupId>com.toddfast.typeconverter</groupId>
+            <artifactId>typeconverter</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
 
 
 </project>
