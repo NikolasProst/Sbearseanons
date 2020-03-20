@@ -66,7 +66,11 @@ public class MyCompany {
             synchronized (MyCompany.class) {
                 localInstance = instance;
                 if (localInstance == null) {
-                    instance = localInstance = new MyCompany(propertyPath);
+                    try {
+                        instance = localInstance = new MyCompany(propertyPath);
+                    } catch (Exception e) {
+                        logger.error(e.getMessage());
+                    }
                 }
             }
         }
@@ -90,12 +94,15 @@ public class MyCompany {
             for (Field field : this.getClass().getDeclaredFields()) {
                 if (field.isAnnotationPresent(Property.class)) {
                     field.setAccessible(true);
-                    field.set(this, castObject(field.getType(), properties.getProperty(field.getAnnotation(Property.class).propertyName())));
+                    String propName = properties.getProperty(field.getAnnotation(Property.class).propertyName());
+                    field.set(this, castObject(field.getType(), propName));
+//                    if (propName.compareTo("null") == 0) {
+//                        logger.error( "value for field +" + field.getName() + " not found");
+//                    }
                 }
             }
         } catch (IOException | IllegalAccessException e) {
-            logger.error("IOEx");
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 

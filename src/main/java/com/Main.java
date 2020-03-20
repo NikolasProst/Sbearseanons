@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class Main {
     public static void main(String[] args) throws JsonProcessingException {
-        MyCompany company = MyCompany.getInstance("src/main/java/prop/prop.properties");
+        MyCompany company = MyCompany.getInstance(args[0]);
         System.out.println(company.toString());
     }
 }
