@@ -38,6 +38,9 @@ public class MyCompany {
     @Property(propertyName = "com.mycompany.owner", defaultValue = "default value")
     private String myCompanyOwner;
 
+    @Property(propertyName = "com.mycompany.manager", defaultValue = "dcdr")
+    private Integer manager;
+
     @Property(propertyName = "com.mycompany.years.old")
     private int old;
 
@@ -49,10 +52,12 @@ public class MyCompany {
 
     @Override
     public String toString() {
-        return "com.MyCompany{" +
-                "myCompanyName='" + myCompanyName + '\'' +
-                ", myCompanyOwner='" + myCompanyOwner + '\'' +
+        return "MyCompany{" +
+                "myCompanyOwner='" + myCompanyOwner + '\'' +
+                ", manager='" + manager + '\'' +
+                ", old=" + old +
                 ", address=" + address +
+                ", myCompanyName='" + myCompanyName + '\'' +
                 '}';
     }
 
@@ -66,9 +71,7 @@ public class MyCompany {
             synchronized (MyCompany.class) {
                 localInstance = instance;
                 if (localInstance == null) {
-
-                        instance = localInstance = new MyCompany(propertyPath);
-
+                    instance = localInstance = new MyCompany(propertyPath);
                 }
             }
         }
@@ -93,16 +96,36 @@ public class MyCompany {
                 if (field.isAnnotationPresent(Property.class)) {
                     field.setAccessible(true);
                     String propName = properties.getProperty(field.getAnnotation(Property.class).propertyName());
+                    boolean isPropExists = true;
                     if (propName == null) {
+                        isPropExists = false;
                         propName = field.getAnnotation(Property.class).defaultValue();
                     }
-                    field.set(this, castObject(field.getType(), propName));
+                    try {
+                        if (propName.equals("null")) {
+                            field.set(this, null);
+                        } else {
+                            field.set(this, castObject(field.getType(), propName));
+                        }
+                    } catch (Exception e) {
+                            logger.error(e.getMessage());
+                            try {
+                                propName = field.getAnnotation(Property.class).defaultValue();
+                                if (!isPropExists || propName.equals("null")) {
+                                    field.set(this, null);
+                                } else {
+                                    field.set(this, castObject(field.getType(), propName));
+                                }
+                        } catch (Exception j) {
+                            logger.error(j.getMessage());
+                            field.set(this, null);
+                        }
+                    }
                 }
             }
         } catch (IOException | IllegalAccessException e) {
             logger.error(e.getMessage());
         }
     }
-
 
 }
