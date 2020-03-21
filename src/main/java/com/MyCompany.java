@@ -35,7 +35,7 @@ public class MyCompany {
 
     private static Logger logger = LogManager.getRootLogger();
 
-    @Property(propertyName = "com.mycompany.owner")
+    @Property(propertyName = "com.mycompany.owner", defaultValue = "default value")
     private String myCompanyOwner;
 
     @Property(propertyName = "com.mycompany.years.old")
@@ -66,11 +66,9 @@ public class MyCompany {
             synchronized (MyCompany.class) {
                 localInstance = instance;
                 if (localInstance == null) {
-                    try {
+
                         instance = localInstance = new MyCompany(propertyPath);
-                    } catch (Exception e) {
-                        logger.error(e.getMessage());
-                    }
+
                 }
             }
         }
@@ -95,10 +93,10 @@ public class MyCompany {
                 if (field.isAnnotationPresent(Property.class)) {
                     field.setAccessible(true);
                     String propName = properties.getProperty(field.getAnnotation(Property.class).propertyName());
+                    if (propName == null) {
+                        propName = field.getAnnotation(Property.class).defaultValue();
+                    }
                     field.set(this, castObject(field.getType(), propName));
-//                    if (propName.compareTo("null") == 0) {
-//                        logger.error( "value for field +" + field.getName() + " not found");
-//                    }
                 }
             }
         } catch (IOException | IllegalAccessException e) {
